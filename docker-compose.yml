@@ -1,0 +1,26 @@
+# Run with: docker-compose up --build
+services:
+  backend:
+    build: ./backend
+    container_name: snmp-backend
+    ports:
+      - "5000:5000"              # Port mapping (host:container)
+    volumes:
+      - ./backend:/app           # Mounts backend source code into the container
+    environment:
+      - FLASK_DEBUG=1
+    command: python3 app.py
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: snmp-frontend
+    ports:
+      - "5173:5173"              # Port mapping (host:container)
+    volumes:
+      - ./frontend/src:/app/src  # Enable Vite Hot Module Replacement (HMR)
+    environment:
+      - VITE_API_URL=http://localhost:5000  # Injects flask API URL into React
+    depends_on:
+      - backend                   # Forces Docker to start React 
+                                  # container after flask API
